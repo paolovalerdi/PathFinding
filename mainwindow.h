@@ -4,8 +4,7 @@
 #include <QMainWindow>
 #include <QtCore>
 #include <QtGui>
-#include "node.h"
-#include "customgraphicsscene.h"
+#include "pathfinder.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +20,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Node **graph = nullptr;
+    PathFinder *path_finder;
 };
 #endif // MAINWINDOW_H
