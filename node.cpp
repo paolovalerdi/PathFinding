@@ -26,6 +26,26 @@ Node::~Node()
 {
 }
 
+int Node::get_x()
+{
+    return x;
+}
+
+int Node::get_y()
+{
+    return y;
+}
+
+void Node::add_neighbour(Node *neighbour)
+{
+    neighbours.push_back(neighbour);
+}
+
+std::vector<Node *> Node::get_neighbours_list()
+{
+    return neighbours;
+}
+
 QRectF Node::boundingRect() const
 {
     return QRectF(x + padding, y + padding, size - 10, size - 10);

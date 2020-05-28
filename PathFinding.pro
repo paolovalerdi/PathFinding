@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    node.cpp
+    node.cpp \
+    pathfinder.cpp
 
 HEADERS += \
     mainwindow.h \
-    node.h
+    node.h \
+    pathfinder.h
 
 FORMS += \
     mainwindow.ui

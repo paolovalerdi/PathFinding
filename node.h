@@ -28,6 +28,11 @@ public:
    Node(int x, int y, int padding, int size);
    ~Node();
 
+   int get_x();
+   int get_y();
+   void add_neighbour(Node *neighbour);
+   std::vector<Node*> get_neighbours_list();
+
    QRectF boundingRect() const override;
    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = Q_NULLPTR) override;
 };
