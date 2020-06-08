@@ -7,15 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>600</height>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(0, 0, 0);
-background-color: rgb(18, 18, 18);</string>
+   <string notr="true">background-color: rgba(40, 41, 54,255);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGraphicsView" name="graphicsView">
@@ -27,8 +26,39 @@ background-color: rgb(18, 18, 18);</string>
       <height>600</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <kerning>true</kerning>
+     </font>
+    </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(40, 41, 54);</string>
+     <string notr="true">background-color: rgba(40, 41, 54,255);
+color: rgba(255, 255, 255, 0);
+border-color: rgba(255, 255, 255, 0);
+border: 0px;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>630</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Google Sans Medium</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(105, 240, 174);
+border-radius: 14px;</string>
+    </property>
+    <property name="text">
+     <string>Solve</string>
     </property>
    </widget>
   </widget>
