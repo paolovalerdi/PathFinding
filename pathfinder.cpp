@@ -1,6 +1,12 @@
 #include "pathfinder.h"
+#include <algorithm>
 
-PathFinder::PathFinder(int map_size, int node_size, int node_padding)
+PathFinder::PathFinder(
+        QObject *parent,
+        int map_size,
+        int node_size,
+        int node_padding
+        ) : QObject(parent)
 {
     this->map_size = map_size;
     this->node_size = node_size;
@@ -8,9 +14,19 @@ PathFinder::PathFinder(int map_size, int node_size, int node_padding)
     this->map_slots = map_size / node_size;
     this->graph_size = map_slots * map_slots;
 
+    was_E_pressed = false;
+    was_S_pressed = false;
+
     scene = new QGraphicsScene();
 
+    startNode = nullptr;
+    endNode = nullptr;
     init_graph();
+}
+
+PathFinder::~PathFinder()
+{
+
 }
 
 void PathFinder::init_graph()
@@ -123,7 +139,117 @@ int PathFinder::get_node_index(int y, int x)
     return (y * map_slots + x) / node_size;
 }
 
+float PathFinder::distance(Node *a, Node *b)
+{
+    return sqrtf((a->get_x() - b->get_x()) * (a->get_x() - b->get_x()) + (a->get_y() - b->get_y()) * (a->get_y() - b->get_y()));
+}
+
 QGraphicsScene *PathFinder::get_scene()
 {
     return scene;
+}
+
+void PathFinder::solve()
+{
+    for (int x = 0; x < map_size; x += node_size)
+    {
+        for (int y = 0; y < map_size; y += node_size)
+        {
+            graph[get_node_index(y,x)]->restart();
+        }
+    }
+
+    Node *current = startNode;
+    startNode->set_local_goal(0.0f);
+    startNode->set_global_goal(distance(startNode, endNode));
+    std::list<Node*> not_visited_node;
+    not_visited_node.push_back(startNode);
+    while (!not_visited_node.empty() && current != endNode)
+    {
+        not_visited_node.sort([]( Node* lhs,  Node* rhs){ return lhs->get_local_goal() < rhs->get_local_goal(); } );
+        while(!not_visited_node.empty() && not_visited_node.front()->get_is_visited())
+        {
+            not_visited_node.pop_front();
+        }
+        if(not_visited_node.empty())
+        {
+            break;
+        }
+        current = not_visited_node.front();
+        current->set_visited(true);
+        for(auto neigbour : current->get_neighbours_list())
+        {
+            if(!neigbour->get_is_visited() && !neigbour->get_is_obstacle())
+            {
+                not_visited_node.push_back(neigbour);
+            }
+            float lowest = current->get_local_goal() + distance(current, neigbour);
+            if(lowest < neigbour->get_local_goal()) {
+                neigbour->set_parent(current);
+                neigbour->set_local_goal(lowest);
+                neigbour->set_global_goal(neigbour->get_local_goal() + distance(neigbour, endNode));
+            }
+        }
+    }
+    if(endNode != nullptr)
+    {
+        Node *parent = endNode;
+        while(parent->get_parent() != nullptr) {
+            parent->update_is_path();
+            parent = parent->get_parent();
+        }
+    }
+}
+
+bool PathFinder::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        switch(keyEvent->key())
+        {
+        case Qt::Key_S:
+        {
+            qDebug() << "Pressed S";
+            was_E_pressed = false;
+            was_S_pressed = true;
+            break;
+        }
+        case Qt::Key_E:
+        {
+            qDebug() << "Pressed E";
+            was_S_pressed= false;
+            was_E_pressed = true;
+            break;
+        }
+        }
+        return true;
+    }
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent *keyEvent = static_cast<QMouseEvent *>(event);
+        Node *item = dynamic_cast<Node*>(scene->itemAt(QPointF(keyEvent->x(), keyEvent->y()), QTransform()));
+        if (item != nullptr) {
+            Node *clickedNode = graph[get_node_index(item->get_y(), item->get_x())];
+            if(was_E_pressed) {
+                if (endNode != nullptr)
+                {
+                    endNode->mark_as_end(false);
+                }
+                endNode = clickedNode;
+                endNode->mark_as_end(true);
+            } else if (was_S_pressed) {
+                if (startNode != nullptr)
+                {
+                    startNode->mark_as_start(false);
+                }
+                startNode = clickedNode;
+                startNode->mark_as_start(true);
+            }
+            was_E_pressed = false;
+            was_S_pressed = false;
+        }
+        return true;
+    }
+    return QObject::eventFilter(watched, event);
 }
